@@ -565,6 +565,123 @@ function createNPCTextures(scene) {
     '.................',
   ]);
 
+  // Elder Maria — white-haired elder in purple robes
+  px(scene, 'npc-elder', {
+    k: 0x111111, W: 0xEEEEEE, w: 0xBDBDBD,
+    s: 0xFFCC80, S: 0xD4956A,
+    V: 0x7B1FA2, v: 0x4A148C,
+    H: 0x6D4C41, h: 0x3E2723
+  }, [
+    '....kWWWWWWWk....',
+    '...kWwwwwwwWWk...',
+    '....ksssssssk....',
+    '....ksSSSSSsk....',
+    '....ksssssssk....',
+    '....kssSSSssk....',
+    '....kssssssssk...',
+    '...kVVVVVVVVVk...',
+    '..kVVVVVVVVVVVk..',
+    '..kVVvVVVVVvvVk..',
+    '..kVVVVVVVVVVVk..',
+    '...kVVVVVVVVVk...',
+    '...kHHkkkHHHk....',
+    '...kHHkkkHHHk....',
+    '....kHkkkHHk.....',
+    '.................',
+  ]);
+
+  // Portrait — Elder Maria (46×46) using 23x23 @ 2px
+  px(scene, 'portrait-elder', {
+    k: 0x111111, V: 0x6A1B9A, v: 0x4A148C,
+    W: 0xEEEEEE, w: 0xBDBDBD,
+    s: 0xFFCC80, S: 0xD4956A, M: 0xA05030,
+    P: 0xCE93D8
+  }, [
+    'kkkkkkkkkkkkkkkkkkkkkkk',
+    'kVVVVVVVVVVVVVVVVVVVVVk',
+    'kVVkWWWWWWWWWWWWWWkVVVk',
+    'kVVkWWwwwwwwwwwwwWkVVVk',
+    'kVVkWWWWWWWWWWWWWWkVVVk',
+    'kVVkWWWWWWWWWWWWWWkVVVk',
+    'kVVkkkWWWWWWWWWWkkkVVVk',
+    'kVVVVVkssssssssskVVVVVk',
+    'kVVVVVksSSSSSSSSkVVVVVk',
+    'kVVVVVksSsssssSSkVVVVVk',
+    'kVVVVVksSSSSSSSSkVVVVVk',
+    'kVVVVVksSSSSSSSSkVVVVVk',
+    'kVVVVVksMMMMMMMSkVVVVVk',
+    'kVVVVVkssssssssSkVVVVVk',
+    'kVVVVkPPPPPPPPPPPPPVVVk',
+    'kVVVkPPPPPPPPPPPPPPPVVk',
+    'kVVVkPPPPPPPPPPPPPPPVVk',
+    'kVVVkPPPPPPPPPPPPPPPVVk',
+    'kVVVkPPPPPPPPPPPPPPPVVk',
+    'kVVVkPPPPPPPPPPPPPPPVVk',
+    'kVVkPPPPPPPPPPPPPPPPPVk',
+    'kVVkPPPPPPPPPPPPPPPPPVk',
+    'kkkkkkkkkkkkkkkkkkkkkkk',
+  ]);
+
+  // Sir Roland — armored knight captain with red plume
+  px(scene, 'npc-captain', {
+    k: 0x111111, R: 0xEF5350, r: 0xB71C1C,
+    M: 0xB0BEC5, m: 0x78909C,
+    A: 0x90A4AE, a: 0x546E7A,
+    B: 0x1565C0, b: 0x0D47A1,
+    s: 0xFFCC80, G: 0xFFD700
+  }, [
+    '....kRRRRRRRk....',
+    '...kRrRRRRrRRk...',
+    '...kMMMMMMMMMk...',
+    '..kMmMMMMMMMmMk..',
+    '..kMmssssssmmMk..',
+    '..kMmssssssmmMk..',
+    '...kMMMMMMMMMMk..',
+    '..kAAAAAAAAAAAk..',
+    '..kAAAAAAAAAAAk..',
+    '..kAAAaAAAAAAak..',
+    '..kAAGGAAAGGAak..',
+    '..kAAAAAAAAAAAk..',
+    '..kBBBkkkBBBBBk..',
+    '..kBBBkkkBBBBBk..',
+    '...kBBkkkkBBBk...',
+    '.................',
+  ]);
+
+  // Portrait — Sir Roland (46×46) using 23x23 @ 2px
+  px(scene, 'portrait-captain', {
+    k: 0x111111, D: 0x0D1B2A, d: 0x1A3A5C,
+    R: 0xEF5350, r: 0xB71C1C,
+    M: 0xB0BEC5, m: 0x78909C,
+    s: 0xFFCC80, S: 0xD4956A,
+    A: 0x90A4AE, a: 0x546E7A,
+    G: 0xFFD700
+  }, [
+    'kkkkkkkkkkkkkkkkkkkkkkk',
+    'kDDDDDDDDDDDDDDDDDDDDDk',
+    'kDDkRRRRRRRRRRRRRRkDDDk',
+    'kDDkRrRRRRRRRRRrRRkDDDk',
+    'kDDkMMMMMMMMMMMMMMkDDDk',
+    'kDDkMMMMMMMMMMMMMMkDDDk',
+    'kDDkkkMMMMMMMMMkkkDDDDk',
+    'kDDDDDkssssssssskDDDDDk',
+    'kDDDDDksSSSSSSSSkDDDDDk',
+    'kDDDDDksSsssssSSkDDDDDk',
+    'kDDDDDksSSSSSSSSkDDDDDk',
+    'kDDDDDksSSSSSSSSkDDDDDk',
+    'kDDDDDksGGGGGGGSkDDDDDk',
+    'kDDDDDkssssssssskDDDDDk',
+    'kDDDDkAAAAAAAAAAAAADDDk',
+    'kDDDkAAAAAAAAAAAAAAAADk',
+    'kDDDkAAAAAAAAAAAAAAAADk',
+    'kDDDkAAAAAAAAAAAAAAAADk',
+    'kDDDkAAAAAAAAAAAAAAAADk',
+    'kDDDkAAAAAAAAAAAAAAAADk',
+    'kDDkAAAAAAAAAAAAAAAAAAk',
+    'kDDkAAAAAAAAAAAAAAAAAAk',
+    'kkkkkkkkkkkkkkkkkkkkkkk',
+  ]);
+
   // Portrait — Forest Spirit (48×48) using 24x24 @ 2px
   px(scene, 'portrait-spirit', {
     k: 0x111111, D: 0x0D2137, d: 0x1A3A5C,
@@ -617,6 +734,44 @@ function createItemTextures(scene) {
     '..kBBBBBBBBk....',
     '...kbbbbbk......',
     '................',
+  ], 2);
+
+  // Kitten (12×12 @ 2px = 24×24) — orange tabby cat
+  px(scene, 'item-kitten', {
+    k: 0x111111, O: 0xFF8C00, o: 0xCC6A00,
+    W: 0xFFFFFF, N: 0xFFAAAB, e: 0x2C2C2C
+  }, [
+    '..kOk.kOk...',
+    '..kOOkOOk...',
+    '...kOOOOk...',
+    '..kOOWWOOk..',
+    '..kOOWWOOk..',
+    '..kOeWNeOk..',
+    '..kOOWWOOk..',
+    '...kOOOOk...',
+    '..kOOOOOOk..',
+    '...koOOook..',
+    '...kOk.kOk..',
+    '............',
+  ], 2);
+
+  // Crystal (12×12 @ 2px = 24×24) — glowing blue gem
+  px(scene, 'item-crystal', {
+    k: 0x111111, B: 0x1E88E5, b: 0x1565C0,
+    L: 0x42A5F5, W: 0xE3F2FD, d: 0x0D47A1
+  }, [
+    '.....kBk....',
+    '....kBLBk...',
+    '...kBLLBBk..',
+    '..kBBLWLBBk.',
+    '.kBBBLWLBBBk',
+    '.kBBBLWLBBBk',
+    '..kBBLWLBBk.',
+    '...kBLLBBk..',
+    '....kBLBk...',
+    '.....kBk....',
+    '............',
+    '............',
   ], 2);
 
   // Collected star (8×8 @ 2px = 16×16)
