@@ -34,6 +34,12 @@ export default class GameScene extends Phaser.Scene {
     // ── Build map ──
     this._buildMap();
 
+    // ── Camera & world bounds ──
+    const mapW = this._mapData.tiles[0].length * TILE_SIZE;
+    const mapH = this._mapData.tiles.length * TILE_SIZE;
+    this.cameras.main.setBounds(0, 0, mapW, mapH);
+    this.physics.world.setBounds(0, 0, mapW, mapH);
+
     // ── Player ──
     const ps = this._mapData.playerStart;
     this._playerKey = `player-${GameState.playerHero}`;
@@ -45,9 +51,10 @@ export default class GameScene extends Phaser.Scene {
     );
     this._player.setTint(GameState.playerColor);
     this._player.setDepth(10);
-    this._player.body.setSize(20, 20);
-    this._player.body.setOffset(6, 12);
-    this._player.setScale(1.1);
+    this._player.body.setSize(18, 18);
+    this._player.body.setOffset(7, 13);
+    this._player.setScale(1.0);
+    this._player.body.setCollideWorldBounds(true);
     this._player.play(`${this._playerKey}-idle`);
 
     // Collision with walls
@@ -78,14 +85,22 @@ export default class GameScene extends Phaser.Scene {
         .setOrigin(0.5).setDepth(20);
       exclaim.setVisible(!this._questStarted);
 
-      // Bounce NPC
+      // Bounce NPC — sync name tag and exclaim so they don't float
+      const origNpcY = npc.y;
+      const origTagY = tag.y;
+      const origExclaimY = exclaim.y;
       this.tweens.add({
         targets: npc,
         y: npc.y - 4,
         duration: 1000,
         yoyo: true,
         repeat: -1,
-        ease: 'Sine.easeInOut'
+        ease: 'Sine.easeInOut',
+        onUpdate: () => {
+          const delta = npc.y - origNpcY;
+          tag.y = origTagY + delta;
+          exclaim.y = origExclaimY + delta;
+        }
       });
 
       this._npcs.push({ sprite: npc, data: npcData, tag, exclaim });
@@ -371,6 +386,12 @@ export default class GameScene extends Phaser.Scene {
     this._handleMovement();
     this._checkItemPickup();
     this._checkPuzzleTrigger();
+
+    // Y-depth sorting: player renders above/below NPCs based on Y position
+    this._player.setDepth(10 + this._player.y / 10000);
+    for (const npcObj of this._npcs) {
+      npcObj.sprite.setDepth(9 + npcObj.sprite.y / 10000);
+    }
   }
 
   _handleMovement() {
@@ -406,7 +427,7 @@ export default class GameScene extends Phaser.Scene {
 
     const moving = vel.x !== 0 || vel.y !== 0;
 
-    // Flip sprite based on direction
+    // Flip sprite based on horizontal direction
     if (vel.x < 0) this._player.setFlipX(true);
     else if (vel.x > 0) this._player.setFlipX(false);
 
