@@ -3,6 +3,7 @@ import GameState from '../data/GameState';
 import { QUESTS } from '../data/quests';
 import { MAPS } from '../data/maps';
 import { TILE_SIZE, SOLID_TILES, TILE_KEYS, PLAYER_SPEED, INTERACT_DISTANCE } from '../data/constants';
+import { SoundManager } from '../audio/SoundManager';
 
 const FLOWER_KEYS = ['flower-red', 'flower-yellow', 'flower-blue', 'flower-green', 'flower-purple'];
 
@@ -166,6 +167,16 @@ export default class GameScene extends Phaser.Scene {
     this.input.on('pointerup', () => {
       // Keep moving until destination reached
     });
+
+    // ── Sound ──
+    // Re-use an existing SoundManager instance if this scene was previously run
+    this._sound = this.registry.get('soundManager');
+    if (!this._sound) {
+      this._sound = new SoundManager(this);
+      this.registry.set('soundManager', this._sound);
+    }
+    this._sound.startMusic();
+    this._wasMoving = false;
 
     // ── UIScene overlay ──
     this.scene.launch('UI', { questId: this._questId });
@@ -443,6 +454,11 @@ export default class GameScene extends Phaser.Scene {
         this._player.play(idleKey);
       }
     }
+
+    // Footstep sounds while moving (throttled internally)
+    if (moving && this._sound) {
+      this._sound.playStep(this.game.loop.delta);
+    }
   }
 
   _checkInteraction() {
@@ -478,6 +494,7 @@ export default class GameScene extends Phaser.Scene {
   _talkToNPC(npcObj) {
     if (this._dialogActive) return;
     this._interactionCooldown = 800;
+    if (this._sound) this._sound.play('dialogOpen');
 
     const npcId = npcObj.data.id;
     if (npcId !== this._quest.startNpcId) return;
@@ -532,6 +549,7 @@ export default class GameScene extends Phaser.Scene {
     this._dialogActive = false;
     this._puzzleActive = false; // reset if puzzle was exited via give-up
     this._interactionCooldown = 600;
+    if (this._sound) this._sound.play('dialogClose');
 
     if (action === 'start-quest') {
       this._questStarted = true;
@@ -541,6 +559,7 @@ export default class GameScene extends Phaser.Scene {
       this._updateUI();
     } else if (action === 'complete-quest') {
       GameState.completeQuest(this._questId, this._quest.stars);
+      if (this._sound) { this._sound.play('complete'); this._sound.stopMusic(); }
       this.cameras.main.fadeOut(500, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
         this.scene.stop('UI');
@@ -568,6 +587,8 @@ export default class GameScene extends Phaser.Scene {
     itemObj.collected = true;
     itemObj.sprite.setVisible(false);
     itemObj.sprite.body.enable = false;
+
+    if (this._sound) this._sound.play('pickup');
 
     const count = GameState.incProgress(this._questId, 'seeds-collected');
     GameState.setProgress(this._questId, `item-${itemObj.data.id}`, 1);

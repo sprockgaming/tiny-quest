@@ -55,8 +55,24 @@ export default class UIScene extends Phaser.Scene {
       color: '#FFD700',
     }).setOrigin(0.5);
 
+    // Mute button
+    const sm = this.registry.get('soundManager');
+    this._muteBtn = this.add.text(W - 10, HUD_H / 2 - 14, sm?.muted ? '🔇' : '🔊', {
+      fontSize: '16px',
+      backgroundColor: '#00000055',
+      padding: { x: 5, y: 3 },
+    }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
+
+    this._muteBtn.on('pointerdown', () => {
+      const soundMgr = this.registry.get('soundManager');
+      if (!soundMgr) return;
+      const muted = soundMgr.toggleMute();
+      this._muteBtn.setText(muted ? '🔇' : '🔊');
+      soundMgr.play('click');
+    });
+
     // Back button (far right)
-    this._backBtn = this.add.text(W - 10, HUD_H / 2, '← Board', {
+    this._backBtn = this.add.text(W - 10, HUD_H / 2 + 8, '← Board', {
       fontSize: '12px',
       fontFamily: 'Arial Black, Arial',
       color: '#AABBFF',
@@ -71,6 +87,8 @@ export default class UIScene extends Phaser.Scene {
       this._backBtn.setStyle({ color: '#AABBFF', backgroundColor: '#00000055' });
     });
     this._backBtn.on('pointerdown', () => {
+      const soundMgr = this.registry.get('soundManager');
+      if (soundMgr) { soundMgr.play('click'); soundMgr.stopMusic(); }
       this.scene.stop('Dialog');
       this.scene.stop('Puzzle');
       this.scene.stop('UI');
