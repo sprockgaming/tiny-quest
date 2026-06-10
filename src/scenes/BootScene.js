@@ -29,9 +29,38 @@ export default class BootScene extends Phaser.Scene {
     // Generate all textures on next tick (keeps boot screen visible briefly)
     this.time.delayedCall(50, () => {
       createAllTextures(this);
+      this._createAnimations();
       this.time.delayedCall(200, () => {
         this.scene.start('Title');
       });
     });
+  }
+
+  _createAnimations() {
+    const heroes = ['knight', 'mage', 'archer', 'healer'];
+
+    for (const hero of heroes) {
+      const key = `player-${hero}`;
+
+      // Idle — frame 0 only
+      if (!this.anims.exists(`${key}-idle`)) {
+        this.anims.create({
+          key: `${key}-idle`,
+          frames: this.anims.generateFrameNumbers(key, { frames: [0] }),
+          frameRate: 1,
+          repeat: -1
+        });
+      }
+
+      // Walk — frames 0→1→2→3→2→1 loop
+      if (!this.anims.exists(`${key}-walk`)) {
+        this.anims.create({
+          key: `${key}-walk`,
+          frames: this.anims.generateFrameNumbers(key, { frames: [0, 1, 2, 3, 2, 1] }),
+          frameRate: 10,
+          repeat: -1
+        });
+      }
+    }
   }
 }
