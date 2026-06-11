@@ -3,12 +3,12 @@ import GameState from '../data/GameState';
 
 // Memory match: 6 pairs of 12 cards (4×3 grid)
 const CARD_SYMBOLS = [
-  { key: '🌟', color: 0xFFD700 },
-  { key: '🔥', color: 0xFF5722 },
-  { key: '💧', color: 0x2196F3 },
-  { key: '🌿', color: 0x4CAF50 },
-  { key: '💜', color: 0x9C27B0 },
-  { key: '🎵', color: 0xFF80AB }
+  { key: '🌟', color: 0xFFD700, shape: '▲' },
+  { key: '🔥', color: 0xFF5722, shape: '●' },
+  { key: '💧', color: 0x2196F3, shape: '■' },
+  { key: '🌿', color: 0x4CAF50, shape: '◆' },
+  { key: '💜', color: 0x9C27B0, shape: '★' },
+  { key: '🎵', color: 0xFF80AB, shape: '✚' }
 ];
 
 export default class PuzzleScene extends Phaser.Scene {
@@ -165,10 +165,20 @@ export default class PuzzleScene extends Phaser.Scene {
     container.add(face);
 
     // Symbol text (hidden)
-    const symText = this.add.text(0, 0, sym.key, {
-      fontSize: '32px'
+    const symText = this.add.text(0, -8, sym.key, {
+      fontSize: '28px'
     }).setOrigin(0.5).setVisible(false);
     container.add(symText);
+
+    // Shape badge for colorblind accessibility (hidden)
+    const shapeBadge = this.add.text(0, 22, sym.shape, {
+      fontSize: '18px',
+      fontFamily: 'Arial',
+      color: '#FFFFFF',
+      stroke: '#00000099',
+      strokeThickness: 2
+    }).setOrigin(0.5).setVisible(false);
+    container.add(shapeBadge);
 
     // Matched glow (hidden)
     const glow = this.add.rectangle(0, 0, cardW + 4, cardH + 4, 0xFFD700, 0)
@@ -176,7 +186,7 @@ export default class PuzzleScene extends Phaser.Scene {
       .setVisible(false);
     container.add(glow);
 
-    const cardObj = { container, back, pat1, face, symText, glow, sym, index, flipped: false, matched: false };
+    const cardObj = { container, back, pat1, face, symText, shapeBadge, glow, sym, index, flipped: false, matched: false };
 
     // Click handler
     back.setInteractive({ useHandCursor: true });
@@ -209,6 +219,7 @@ export default class PuzzleScene extends Phaser.Scene {
         card.pat1.setVisible(false);
         card.face.setVisible(true);
         card.symText.setVisible(true);
+        card.shapeBadge.setVisible(true);
         this.tweens.add({
           targets: card.container,
           scaleX: 1,
@@ -283,6 +294,7 @@ export default class PuzzleScene extends Phaser.Scene {
           onComplete: () => {
             card.face.setVisible(false);
             card.symText.setVisible(false);
+            card.shapeBadge.setVisible(false);
             card.back.setVisible(true);
             card.pat1.setVisible(true);
             this.tweens.add({

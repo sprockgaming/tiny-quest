@@ -254,30 +254,29 @@ export default class GameScene extends Phaser.Scene {
         .setInteractive({ useHandCursor: !done });
 
       if (!done) {
-        // Order number badge
-        const badge = this.add.text(fx + 10, fy - 10, String(fd.order + 1), {
-          fontSize: '11px',
+        // Order number badge — enlarged for colorblind accessibility
+        const badgeBg = this.add.circle(fx + 12, fy - 14, 13, 0xFFFFFF, 0.9).setDepth(21);
+        const badge = this.add.text(fx + 12, fy - 14, String(fd.order + 1), {
+          fontSize: '14px',
           fontFamily: 'Arial Black',
-          color: '#FFFFFF',
-          backgroundColor: '#00000099',
-          padding: { x: 3, y: 1 }
-        }).setDepth(21);
+          color: '#333333'
+        }).setOrigin(0.5).setDepth(22);
 
         sprite.on('pointerdown', () => {
           if (!this._questStarted || this._dialogActive || this._flowersDone) return;
-          this._tapFlower(i, sprite, badge, fd);
+          this._tapFlower(i, sprite, badge, badgeBg, fd);
         });
         sprite.on('pointerover', () => sprite.setScale(1.05));
         sprite.on('pointerout', () => sprite.setScale(0.9));
 
-        this._flowers.push({ sprite, badge, data: fd, bloomed: false });
+        this._flowers.push({ sprite, badge, badgeBg, data: fd, bloomed: false });
       } else {
-        this._flowers.push({ sprite, badge: null, data: fd, bloomed: true });
+        this._flowers.push({ sprite, badge: null, badgeBg: null, data: fd, bloomed: true });
       }
     });
   }
 
-  _tapFlower(index, sprite, badge, fd) {
+  _tapFlower(index, sprite, badge, badgeBg, fd) {
     const expected = this._flowerNext;
     if (fd.order === expected) {
       // Correct!
@@ -287,6 +286,7 @@ export default class GameScene extends Phaser.Scene {
       sprite.setTexture(`flower-${colorKey}-bloom`);
       sprite.disableInteractive();
       if (badge) badge.destroy();
+      if (badgeBg) badgeBg.destroy();
       this.tweens.add({ targets: sprite, scaleX: 1.3, scaleY: 1.3, duration: 150, yoyo: true });
 
       // Show a little particle effect

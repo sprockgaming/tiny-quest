@@ -113,6 +113,13 @@ export default class CharacterSelectScene extends Phaser.Scene {
         .setStrokeStyle(3, 0xFFD700);
       ring.setVisible(false);
 
+      // Color name label for colorblind accessibility
+      this.add.text(cx, cy + 28, c.name, {
+        fontSize: '11px',
+        fontFamily: 'Arial',
+        color: '#FFFFFF'
+      }).setOrigin(0.5);
+
       this._colorDots.push({ dot, ring, cx, cy });
     });
 
