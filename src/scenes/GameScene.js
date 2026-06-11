@@ -86,10 +86,20 @@ export default class GameScene extends Phaser.Scene {
         .setOrigin(0.5).setDepth(20);
       exclaim.setVisible(!this._questStarted);
 
-      // Bounce NPC — sync name tag and exclaim so they don't float
+      // Talk label (shown when player is within interact range)
+      const talkLabel = this.add.text(npc.x, npc.y - 60, '💬 E to talk', {
+        fontSize: '13px',
+        fontFamily: 'Arial',
+        color: '#FFFFFF',
+        backgroundColor: '#1a3a6e',
+        padding: { x: 6, y: 3 }
+      }).setOrigin(0.5).setDepth(21).setAlpha(0);
+
+      // Bounce NPC — sync name tag, exclaim and talkLabel so they don't float
       const origNpcY = npc.y;
       const origTagY = tag.y;
       const origExclaimY = exclaim.y;
+      const origTalkY = talkLabel.y;
       this.tweens.add({
         targets: npc,
         y: npc.y - 4,
@@ -101,10 +111,11 @@ export default class GameScene extends Phaser.Scene {
           const delta = npc.y - origNpcY;
           tag.y = origTagY + delta;
           exclaim.y = origExclaimY + delta;
+          talkLabel.y = origTalkY + delta;
         }
       });
 
-      this._npcs.push({ sprite: npc, data: npcData, tag, exclaim });
+      this._npcs.push({ sprite: npc, data: npcData, tag, exclaim, talkLabel, inRange: false });
     }
 
     // ── Items (seed bags for farm quest) ──
@@ -397,6 +408,7 @@ export default class GameScene extends Phaser.Scene {
     this._handleMovement();
     this._checkItemPickup();
     this._checkPuzzleTrigger();
+    this._updateNPCIndicators();
 
     // Y-depth sorting: player renders above/below NPCs based on Y position
     this._player.setDepth(10 + this._player.y / 10000);
@@ -458,6 +470,26 @@ export default class GameScene extends Phaser.Scene {
     // Footstep sounds while moving (throttled internally)
     if (moving && this._sound) {
       this._sound.playStep(this.game.loop.delta);
+    }
+  }
+
+  _updateNPCIndicators() {
+    for (const npcObj of this._npcs) {
+      const dist = Phaser.Math.Distance.Between(
+        this._player.x, this._player.y,
+        npcObj.sprite.x, npcObj.sprite.y
+      );
+      const inRange = dist <= INTERACT_DISTANCE;
+      if (inRange !== npcObj.inRange) {
+        npcObj.inRange = inRange;
+        if (inRange) {
+          npcObj.sprite.setTint(0xFFFF88);
+          this.tweens.add({ targets: npcObj.talkLabel, alpha: 1, duration: 200 });
+        } else {
+          npcObj.sprite.clearTint();
+          this.tweens.add({ targets: npcObj.talkLabel, alpha: 0, duration: 200 });
+        }
+      }
     }
   }
 
