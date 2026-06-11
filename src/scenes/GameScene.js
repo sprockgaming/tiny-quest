@@ -311,6 +311,26 @@ export default class GameScene extends Phaser.Scene {
         yoyo: true,
         repeat: 4
       });
+
+      // Encouraging toast above player
+      const msgs = ["Oops! Check the numbers!", "So close! Try again!", "You've got this, hero!"];
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+      const toast = this.add.text(this._player.x, this._player.y - 40, msg, {
+        fontSize: '14px',
+        fontFamily: 'Arial Black',
+        color: '#FFFFFF',
+        backgroundColor: '#FF7043',
+        padding: { x: 10, y: 5 }
+      }).setOrigin(0.5, 1).setDepth(150);
+      this.tweens.add({
+        targets: toast,
+        y: toast.y - 30,
+        alpha: 0,
+        duration: 1500,
+        ease: 'Power2',
+        onComplete: () => toast.destroy()
+      });
+
       // Show hint after 2 wrong attempts
       const wrongCount = (GameState.getProgress(this._questId, 'wrong-taps') || 0) + 1;
       GameState.setProgress(this._questId, 'wrong-taps', wrongCount);

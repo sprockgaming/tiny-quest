@@ -103,7 +103,7 @@ export default class PuzzleScene extends Phaser.Scene {
     });
 
     // Close button
-    const closeBtn = this.add.text(W / 2, panelY + panelH - 20, '✕ Give up (go back)', {
+    const closeBtn = this.add.text(W / 2, panelY + panelH - 20, '✕ Try later', {
       fontSize: '12px',
       fontFamily: 'Arial',
       color: '#FF8A80'
@@ -247,6 +247,32 @@ export default class PuzzleScene extends Phaser.Scene {
         this.time.delayedCall(600, () => this._onAllMatched());
       }
     } else {
+      // No match — show encouragement banner
+      const W = this.scale.width;
+      const H = this.scale.height;
+      const missBanner = this.add.text(W / 2, H, 'Almost! Keep looking...', {
+        fontSize: '13px',
+        fontFamily: 'Arial',
+        fontStyle: 'italic',
+        color: '#B3E5FC',
+        backgroundColor: '#0D2137',
+        padding: { x: 12, y: 6 }
+      }).setOrigin(0.5, 1).setDepth(300).setAlpha(0);
+      this.tweens.add({
+        targets: missBanner,
+        alpha: 1,
+        duration: 200,
+        onComplete: () => {
+          this.tweens.add({
+            targets: missBanner,
+            alpha: 0,
+            duration: 400,
+            delay: 900,
+            onComplete: () => missBanner.destroy()
+          });
+        }
+      });
+
       // No match — flip back
       [a, b].forEach(card => {
         card.flipped = false;
