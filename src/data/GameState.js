@@ -8,6 +8,7 @@ const GameState = {
   starsEarned: 0,
   currentQuestId: null,
   questProgress: {},
+  seenHints: {},
 
   reset() {
     this.playerName = 'Hero';
@@ -17,6 +18,7 @@ const GameState = {
     this.starsEarned = 0;
     this.currentQuestId = null;
     this.questProgress = {};
+    this.seenHints = {};
   },
 
   save() {
@@ -28,6 +30,7 @@ const GameState = {
         questsCompleted: this.questsCompleted,
         starsEarned: this.starsEarned,
         questProgress: this.questProgress,
+        seenHints: this.seenHints,
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
     } catch (e) {
@@ -46,10 +49,20 @@ const GameState = {
       this.questsCompleted = data.questsCompleted ?? [];
       this.starsEarned = data.starsEarned ?? 0;
       this.questProgress = data.questProgress ?? {};
+      this.seenHints = data.seenHints ?? {};
       return true;
     } catch (e) {
       return false;
     }
+  },
+
+  hasSeenHint(key) {
+    return !!this.seenHints[key];
+  },
+
+  markHintSeen(key) {
+    this.seenHints[key] = true;
+    this.save();
   },
 
   hasSave() {

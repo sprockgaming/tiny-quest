@@ -111,6 +111,37 @@ export default class PuzzleScene extends Phaser.Scene {
     closeBtn.on('pointerdown', () => this._close(false));
     closeBtn.on('pointerover', () => closeBtn.setStyle({ color: '#FF5252' }));
     closeBtn.on('pointerout', () => closeBtn.setStyle({ color: '#FF8A80' }));
+
+    // First-time hint banner
+    if (!GameState.hasSeenHint('puzzleHint')) {
+      GameState.markHintSeen('puzzleHint');
+      const banner = this.add.text(W / 2, -50,
+        '💡 Tap two stones to find matching pairs!',
+        {
+          fontSize: '14px',
+          fontFamily: 'Arial',
+          color: '#FFFFFF',
+          backgroundColor: '#0D2137',
+          padding: { x: 14, y: 7 },
+        }
+      ).setOrigin(0.5, 0).setDepth(400);
+
+      this.tweens.add({
+        targets: banner,
+        y: 10,
+        duration: 350,
+        ease: 'Back.easeOut',
+        onComplete: () => {
+          this.tweens.add({
+            targets: banner,
+            alpha: 0,
+            duration: 500,
+            delay: 2000,
+            onComplete: () => banner.destroy()
+          });
+        }
+      });
+    }
   }
 
   _makeCard(cx, cy, cardW, cardH, sym, index) {

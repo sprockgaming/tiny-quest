@@ -589,6 +589,13 @@ export default class GameScene extends Phaser.Scene {
       // Show NPCexclaim off
       this._npcs.forEach(n => n.exclaim.setVisible(false));
       this._updateUI();
+
+      // Show first-time mechanic hints
+      if (this._mapData.flowers?.length > 0 && !GameState.hasSeenHint('flowerHint')) {
+        this.time.delayedCall(400, () => this._showFlowerHint());
+      } else if (this._mapData.items?.length > 0 && !GameState.hasSeenHint('itemHint')) {
+        this.time.delayedCall(400, () => this._showItemHint());
+      }
     } else if (action === 'complete-quest') {
       GameState.completeQuest(this._questId, this._quest.stars);
       if (this._sound) { this._sound.play('complete'); this._sound.stopMusic(); }
@@ -742,6 +749,97 @@ export default class GameScene extends Phaser.Scene {
         onComplete: () => p.destroy()
       });
     }
+  }
+
+  _showFlowerHint() {
+    const W = this.scale.width;
+    const H = this.scale.height;
+
+    // Semi-transparent overlay
+    const overlay = this.add.rectangle(0, 0, W, H, 0x000000, 0.6)
+      .setOrigin(0, 0).setDepth(300).setScrollFactor(0)
+      .setAlpha(0);
+
+    // Panel
+    const panelW = 300;
+    const panelH = 130;
+    const panel = this.add.rectangle(W / 2, H / 2, panelW, panelH, 0x1A1A2E, 0.97)
+      .setStrokeStyle(3, 0xFFD700)
+      .setDepth(301).setScrollFactor(0).setAlpha(0);
+
+    const title = this.add.text(W / 2, H / 2 - 36, '🌸 Tap the flowers in order!', {
+      fontSize: '16px',
+      fontFamily: 'Arial Black',
+      color: '#FFD700'
+    }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
+
+    const body = this.add.text(W / 2, H / 2 - 6, 'Look for the numbers: 1 → 2 → 3', {
+      fontSize: '13px',
+      fontFamily: 'Arial',
+      color: '#FFFFFF'
+    }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
+
+    const btn = this.add.text(W / 2, H / 2 + 34, 'Got it! ✓', {
+      fontSize: '14px',
+      fontFamily: 'Arial Black',
+      color: '#1A1A2E',
+      backgroundColor: '#FFD700',
+      padding: { x: 18, y: 8 }
+    }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0)
+      .setInteractive({ useHandCursor: true });
+
+    const elements = [overlay, panel, title, body, btn];
+
+    // Fade in
+    this.tweens.add({ targets: elements, alpha: 1, duration: 300 });
+
+    btn.on('pointerdown', () => {
+      GameState.markHintSeen('flowerHint');
+      this.tweens.add({
+        targets: elements,
+        alpha: 0,
+        duration: 200,
+        onComplete: () => elements.forEach(e => e.destroy())
+      });
+    });
+    btn.on('pointerover', () => btn.setStyle({ color: '#000000' }));
+    btn.on('pointerout', () => btn.setStyle({ color: '#1A1A2E' }));
+  }
+
+  _showItemHint() {
+    const W = this.scale.width;
+
+    const toast = this.add.text(W / 2, -40,
+      '✨ Items appear as glowing objects! Walk over them to collect.',
+      {
+        fontSize: '13px',
+        fontFamily: 'Arial',
+        color: '#FFFFFF',
+        backgroundColor: '#1a3a6e',
+        padding: { x: 12, y: 7 },
+        wordWrap: { width: W - 60 },
+        align: 'center'
+      }
+    ).setOrigin(0.5, 0).setDepth(300).setScrollFactor(0);
+
+    GameState.markHintSeen('itemHint');
+
+    // Slide down from top
+    this.tweens.add({
+      targets: toast,
+      y: 10,
+      duration: 350,
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        this.tweens.add({
+          targets: toast,
+          alpha: 0,
+          duration: 500,
+          delay: 3000,
+          onComplete: () => toast.destroy()
+        });
+      }
+    });
   }
 
   _showCheckmark(x, y) {
