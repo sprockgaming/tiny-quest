@@ -194,6 +194,7 @@ export default class CharacterSelectScene extends Phaser.Scene {
   _startGame() {
     GameState.playerHero = HERO_TYPES[this._selectedHero];
     GameState.playerColor = PLAYER_COLORS[this._selectedColor].hex;
+    GameState.save();
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start('QuestBoard');

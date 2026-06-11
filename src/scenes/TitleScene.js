@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { COLORS, FONTS, addSparkles, drawPanel } from '../ui/UITheme';
+import GameState from '../data/GameState';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -92,63 +93,140 @@ export default class TitleScene extends Phaser.Scene {
 
     // ── Buttons ───────────────────────────────────────────────────────────
     const btnCenterX = W / 2;
-    const btnY1 = H * 0.47;
-    const btnY2 = H * 0.575;
+    const hasSave = GameState.hasSave();
 
-    // Play button
-    const playBtnBg = this.add.graphics();
-    const playLabel = this.add.text(btnCenterX, btnY1, '▶  Start Adventure!', {
-      fontSize: '22px',
-      fontFamily: 'Arial Black, Arial',
-      color: '#FFFFFF',
-      stroke: '#145A32',
-      strokeThickness: 3,
-    }).setOrigin(0.5);
+    // Layout: if save exists → [Continue] [New Game] [How to Play]
+    //         otherwise      → [Start Adventure] [How to Play]
+    const btnY1 = H * (hasSave ? 0.43 : 0.47);
+    const btnY2 = H * (hasSave ? 0.52 : 0.575);
+    const btnY3 = H * 0.61; // How to Play (only when save exists)
 
-    const drawPlayBtn = (hov) => {
-      playBtnBg.clear();
-      playBtnBg.fillStyle(hov ? COLORS.btnGreenHov : COLORS.btnGreen, 1);
-      playBtnBg.fillRoundedRect(btnCenterX - 130, btnY1 - 28, 260, 56, 14);
-      playBtnBg.lineStyle(3, 0x1E8449, 1);
-      playBtnBg.strokeRoundedRect(btnCenterX - 130, btnY1 - 28, 260, 56, 14);
-    };
-    drawPlayBtn(false);
+    const fadeTargets = [];
 
-    const playZone = this.add.zone(btnCenterX, btnY1, 260, 56)
-      .setInteractive({ useHandCursor: true });
-    playZone.on('pointerover', () => { drawPlayBtn(true); this.tweens.add({ targets: [playBtnBg, playLabel], scaleX: 1.04, scaleY: 1.04, duration: 80 }); });
-    playZone.on('pointerout',  () => { drawPlayBtn(false); this.tweens.add({ targets: [playBtnBg, playLabel], scaleX: 1, scaleY: 1, duration: 80 }); });
-    playZone.on('pointerdown', () => this._goPlay());
+    if (hasSave) {
+      // Continue Adventure button (blue)
+      const contBtnBg = this.add.graphics();
+      const contLabel = this.add.text(btnCenterX, btnY1, '▶  Continue Adventure', {
+        fontSize: '22px',
+        fontFamily: 'Arial Black, Arial',
+        color: '#FFFFFF',
+        stroke: '#0D3B7A',
+        strokeThickness: 3,
+      }).setOrigin(0.5);
 
-    // How to Play button
-    const howBtnBg = this.add.graphics();
-    const howLabel = this.add.text(btnCenterX, btnY2, '❓  How to Play', {
-      fontSize: '18px',
-      fontFamily: 'Arial Black, Arial',
-      color: '#FFFFFF',
-      stroke: '#1A237E',
-      strokeThickness: 3,
-    }).setOrigin(0.5);
+      const drawContBtn = (hov) => {
+        contBtnBg.clear();
+        contBtnBg.fillStyle(hov ? 0x1E88E5 : 0x1565C0, 1);
+        contBtnBg.fillRoundedRect(btnCenterX - 140, btnY1 - 28, 280, 56, 14);
+        contBtnBg.lineStyle(3, 0x0D47A1, 1);
+        contBtnBg.strokeRoundedRect(btnCenterX - 140, btnY1 - 28, 280, 56, 14);
+      };
+      drawContBtn(false);
+      const contZone = this.add.zone(btnCenterX, btnY1, 280, 56).setInteractive({ useHandCursor: true });
+      contZone.on('pointerover', () => { drawContBtn(true); this.tweens.add({ targets: [contBtnBg, contLabel], scaleX: 1.04, scaleY: 1.04, duration: 80 }); });
+      contZone.on('pointerout',  () => { drawContBtn(false); this.tweens.add({ targets: [contBtnBg, contLabel], scaleX: 1, scaleY: 1, duration: 80 }); });
+      contZone.on('pointerdown', () => this._goContinue());
+      fadeTargets.push(contBtnBg, contLabel);
 
-    const drawHowBtn = (hov) => {
-      howBtnBg.clear();
-      howBtnBg.fillStyle(hov ? COLORS.btnBlueHov : COLORS.btnBlue, 1);
-      howBtnBg.fillRoundedRect(btnCenterX - 110, btnY2 - 24, 220, 48, 12);
-      howBtnBg.lineStyle(3, 0x0D47A1, 1);
-      howBtnBg.strokeRoundedRect(btnCenterX - 110, btnY2 - 24, 220, 48, 12);
-    };
-    drawHowBtn(false);
+      // New Game button (green, smaller)
+      const newBtnBg = this.add.graphics();
+      const newLabel = this.add.text(btnCenterX, btnY2, '🌟  New Game', {
+        fontSize: '18px',
+        fontFamily: 'Arial Black, Arial',
+        color: '#FFFFFF',
+        stroke: '#145A32',
+        strokeThickness: 3,
+      }).setOrigin(0.5);
 
-    const howZone = this.add.zone(btnCenterX, btnY2, 220, 48)
-      .setInteractive({ useHandCursor: true });
-    howZone.on('pointerover', () => { drawHowBtn(true); this.tweens.add({ targets: [howBtnBg, howLabel], scaleX: 1.04, scaleY: 1.04, duration: 80 }); });
-    howZone.on('pointerout',  () => { drawHowBtn(false); this.tweens.add({ targets: [howBtnBg, howLabel], scaleX: 1, scaleY: 1, duration: 80 }); });
-    howZone.on('pointerdown', () => this._goTutorial());
+      const drawNewBtn = (hov) => {
+        newBtnBg.clear();
+        newBtnBg.fillStyle(hov ? COLORS.btnGreenHov : COLORS.btnGreen, 1);
+        newBtnBg.fillRoundedRect(btnCenterX - 110, btnY2 - 24, 220, 48, 12);
+        newBtnBg.lineStyle(3, 0x1E8449, 1);
+        newBtnBg.strokeRoundedRect(btnCenterX - 110, btnY2 - 24, 220, 48, 12);
+      };
+      drawNewBtn(false);
+      const newZone = this.add.zone(btnCenterX, btnY2, 220, 48).setInteractive({ useHandCursor: true });
+      newZone.on('pointerover', () => { drawNewBtn(true); this.tweens.add({ targets: [newBtnBg, newLabel], scaleX: 1.04, scaleY: 1.04, duration: 80 }); });
+      newZone.on('pointerout',  () => { drawNewBtn(false); this.tweens.add({ targets: [newBtnBg, newLabel], scaleX: 1, scaleY: 1, duration: 80 }); });
+      newZone.on('pointerdown', () => this._confirmNewGame());
+      fadeTargets.push(newBtnBg, newLabel);
+
+      // How to Play button
+      const howBtnBg = this.add.graphics();
+      const howLabel = this.add.text(btnCenterX, btnY3, '❓  How to Play', {
+        fontSize: '16px',
+        fontFamily: 'Arial Black, Arial',
+        color: '#FFFFFF',
+        stroke: '#1A237E',
+        strokeThickness: 3,
+      }).setOrigin(0.5);
+      const drawHowBtn = (hov) => {
+        howBtnBg.clear();
+        howBtnBg.fillStyle(hov ? COLORS.btnBlueHov : COLORS.btnBlue, 1);
+        howBtnBg.fillRoundedRect(btnCenterX - 100, btnY3 - 22, 200, 44, 12);
+        howBtnBg.lineStyle(3, 0x0D47A1, 1);
+        howBtnBg.strokeRoundedRect(btnCenterX - 100, btnY3 - 22, 200, 44, 12);
+      };
+      drawHowBtn(false);
+      const howZone = this.add.zone(btnCenterX, btnY3, 200, 44).setInteractive({ useHandCursor: true });
+      howZone.on('pointerover', () => { drawHowBtn(true); this.tweens.add({ targets: [howBtnBg, howLabel], scaleX: 1.04, scaleY: 1.04, duration: 80 }); });
+      howZone.on('pointerout',  () => { drawHowBtn(false); this.tweens.add({ targets: [howBtnBg, howLabel], scaleX: 1, scaleY: 1, duration: 80 }); });
+      howZone.on('pointerdown', () => this._goTutorial());
+      fadeTargets.push(howBtnBg, howLabel);
+
+    } else {
+      // No save — original layout
+      const playBtnBg = this.add.graphics();
+      const playLabel = this.add.text(btnCenterX, btnY1, '▶  Start Adventure!', {
+        fontSize: '22px',
+        fontFamily: 'Arial Black, Arial',
+        color: '#FFFFFF',
+        stroke: '#145A32',
+        strokeThickness: 3,
+      }).setOrigin(0.5);
+
+      const drawPlayBtn = (hov) => {
+        playBtnBg.clear();
+        playBtnBg.fillStyle(hov ? COLORS.btnGreenHov : COLORS.btnGreen, 1);
+        playBtnBg.fillRoundedRect(btnCenterX - 130, btnY1 - 28, 260, 56, 14);
+        playBtnBg.lineStyle(3, 0x1E8449, 1);
+        playBtnBg.strokeRoundedRect(btnCenterX - 130, btnY1 - 28, 260, 56, 14);
+      };
+      drawPlayBtn(false);
+      const playZone = this.add.zone(btnCenterX, btnY1, 260, 56).setInteractive({ useHandCursor: true });
+      playZone.on('pointerover', () => { drawPlayBtn(true); this.tweens.add({ targets: [playBtnBg, playLabel], scaleX: 1.04, scaleY: 1.04, duration: 80 }); });
+      playZone.on('pointerout',  () => { drawPlayBtn(false); this.tweens.add({ targets: [playBtnBg, playLabel], scaleX: 1, scaleY: 1, duration: 80 }); });
+      playZone.on('pointerdown', () => this._goPlay());
+      fadeTargets.push(playBtnBg, playLabel);
+
+      const howBtnBg = this.add.graphics();
+      const howLabel = this.add.text(btnCenterX, btnY2, '❓  How to Play', {
+        fontSize: '18px',
+        fontFamily: 'Arial Black, Arial',
+        color: '#FFFFFF',
+        stroke: '#1A237E',
+        strokeThickness: 3,
+      }).setOrigin(0.5);
+      const drawHowBtn = (hov) => {
+        howBtnBg.clear();
+        howBtnBg.fillStyle(hov ? COLORS.btnBlueHov : COLORS.btnBlue, 1);
+        howBtnBg.fillRoundedRect(btnCenterX - 110, btnY2 - 24, 220, 48, 12);
+        howBtnBg.lineStyle(3, 0x0D47A1, 1);
+        howBtnBg.strokeRoundedRect(btnCenterX - 110, btnY2 - 24, 220, 48, 12);
+      };
+      drawHowBtn(false);
+      const howZone = this.add.zone(btnCenterX, btnY2, 220, 48).setInteractive({ useHandCursor: true });
+      howZone.on('pointerover', () => { drawHowBtn(true); this.tweens.add({ targets: [howBtnBg, howLabel], scaleX: 1.04, scaleY: 1.04, duration: 80 }); });
+      howZone.on('pointerout',  () => { drawHowBtn(false); this.tweens.add({ targets: [howBtnBg, howLabel], scaleX: 1, scaleY: 1, duration: 80 }); });
+      howZone.on('pointerdown', () => this._goTutorial());
+      fadeTargets.push(howBtnBg, howLabel);
+    }
 
     // Fade in buttons
-    [playBtnBg, playLabel, howBtnBg, howLabel].forEach(obj => obj.setAlpha(0));
+    fadeTargets.forEach(obj => obj.setAlpha(0));
     this.time.delayedCall(700, () => {
-      this.tweens.add({ targets: [playBtnBg, playLabel, howBtnBg, howLabel], alpha: 1, duration: 500 });
+      this.tweens.add({ targets: fadeTargets, alpha: 1, duration: 500 });
     });
 
     // ── Version / credit ─────────────────────────────────────────────────
@@ -170,9 +248,9 @@ export default class TitleScene extends Phaser.Scene {
       this.tweens.add({ targets: tapHint, alpha: 0.8, duration: 800, yoyo: true, repeat: -1 });
     });
 
-    // Keyboard shortcut
-    this.input.keyboard.on('keydown-SPACE', () => this._goPlay());
-    this.input.keyboard.on('keydown-ENTER', () => this._goPlay());
+    // Keyboard shortcut — SPACE/ENTER continues if save exists, else starts fresh
+    this.input.keyboard.on('keydown-SPACE', () => hasSave ? this._goContinue() : this._goPlay());
+    this.input.keyboard.on('keydown-ENTER', () => hasSave ? this._goContinue() : this._goPlay());
   }
 
   _goPlay() {
@@ -180,6 +258,23 @@ export default class TitleScene extends Phaser.Scene {
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start('CharacterSelect');
     });
+  }
+
+  _goContinue() {
+    GameState.load();
+    this.cameras.main.fadeOut(350, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start('QuestBoard');
+    });
+  }
+
+  _confirmNewGame() {
+    // Simple confirm dialog before erasing save
+    const confirmed = window.confirm('Start fresh? Your progress will be lost.');
+    if (!confirmed) return;
+    GameState.clearSave();
+    GameState.reset();
+    this._goPlay();
   }
 
   _goTutorial() {

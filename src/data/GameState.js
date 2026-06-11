@@ -1,3 +1,5 @@
+const SAVE_KEY = 'tinyquest_save';
+
 const GameState = {
   playerName: 'Hero',
   playerHero: 'knight',
@@ -17,6 +19,55 @@ const GameState = {
     this.questProgress = {};
   },
 
+  save() {
+    try {
+      const data = {
+        playerName: this.playerName,
+        playerHero: this.playerHero,
+        playerColor: this.playerColor,
+        questsCompleted: this.questsCompleted,
+        starsEarned: this.starsEarned,
+        questProgress: this.questProgress,
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    } catch (e) {
+      // localStorage unavailable (private browsing, storage full, etc.)
+    }
+  },
+
+  load() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      this.playerName = data.playerName ?? 'Hero';
+      this.playerHero = data.playerHero ?? 'knight';
+      this.playerColor = data.playerColor ?? 0xE53935;
+      this.questsCompleted = data.questsCompleted ?? [];
+      this.starsEarned = data.starsEarned ?? 0;
+      this.questProgress = data.questProgress ?? {};
+      return true;
+    } catch (e) {
+      return false;
+    }
+  },
+
+  hasSave() {
+    try {
+      return localStorage.getItem(SAVE_KEY) !== null;
+    } catch (e) {
+      return false;
+    }
+  },
+
+  clearSave() {
+    try {
+      localStorage.removeItem(SAVE_KEY);
+    } catch (e) {
+      // ignore
+    }
+  },
+
   isQuestComplete(questId) {
     return this.questsCompleted.includes(questId);
   },
@@ -25,6 +76,7 @@ const GameState = {
     if (!this.isQuestComplete(questId)) {
       this.questsCompleted.push(questId);
       this.starsEarned += stars;
+      this.save();
     }
   },
 
